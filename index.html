@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de Currículo Profissional</title>
+<meta name="description" content="Crie um currículo profissional, compatível com ATS, e baixe em PDF. Grátis, sem cadastro.">
+<style>
+:root{--bg:#f3f4f6;--panel:#fff;--ink:#111827;--mut:#6b7280;--line:#e5e7eb;--acc:#1d4ed8;--acc2:#1e40af}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header.top{background:#0f172a;color:#fff;padding:14px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header.top h1{font-size:18px;margin:0}
+header.top small{color:#94a3b8;display:block;font-weight:400}
+.btn{border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;background:var(--acc);color:#fff}
+.btn:hover{background:var(--acc2)}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:12px}
+.btn.del{background:#fee2e2;color:#b91c1c}
+.layout{display:grid;grid-template-columns:minmax(320px,480px) 1fr;gap:20px;padding:20px;max-width:1400px;margin:auto}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.preview-wrap{order:2}}
+.form{display:flex;flex-direction:column;gap:14px}
+details.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0}
+details.card>summary{cursor:pointer;padding:14px 16px;font-weight:700;list-style:none;display:flex;justify-content:space-between}
+details.card>summary::after{content:"+";color:var(--mut)}
+details[open].card>summary::after{content:"–"}
+.card .body{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.tip{font-size:12px;color:var(--mut);background:#eff6ff;border-radius:8px;padding:8px 10px;line-height:1.4}
+label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:3px}
+input,textarea,select{width:100%;padding:9px 10px;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:14px;background:#fff}
+input:focus,textarea:focus,select:focus{outline:2px solid #93c5fd;border-color:var(--acc)}
+textarea{resize:vertical;min-height:70px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{border:1px dashed #cbd5e1;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fafafa}
+.item .bar{display:flex;gap:6px;justify-content:flex-end}
+.preview-wrap{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 20px);overflow:auto}
+.sheet-scale{transform-origin:top left}
+#cv{background:#fff;width:210mm;min-height:297mm;padding:16mm 16mm;box-shadow:0 2px 12px rgba(0,0,0,.15);font-size:10.5pt;line-height:1.4;color:#111}
+#cv h1{font-size:24pt;margin:0;line-height:1.1}
+#cv .role{font-size:12pt;margin-top:3px;color:var(--cv-acc,#1d4ed8);font-weight:600}
+#cv .contact{margin-top:8px;font-size:9.5pt;color:#374151;display:flex;flex-wrap:wrap;gap:3px 14px}
+#cv h2{font-size:11pt;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px;padding-bottom:3px;border-bottom:1.5px solid var(--cv-acc,#1d4ed8);color:var(--cv-acc,#1d4ed8)}
+#cv .entry{margin-bottom:9px;break-inside:avoid}
+#cv .eh{display:flex;justify-content:space-between;gap:10px;font-weight:700}
+#cv .eh span.d{font-weight:400;color:#4b5563;white-space:nowrap;font-size:9.5pt}
+#cv .sub{color:#374151;font-style:italic;font-size:10pt}
+#cv ul{margin:3px 0 0 18px;padding:0}
+#cv li{margin-bottom:2px}
+#cv p{margin:0}
+#cv .skills{display:flex;flex-wrap:wrap;gap:4px 6px}
+#cv .skills span{background:#f3f4f6;border-radius:4px;padding:1px 8px;font-size:10pt}
+#cv .head{display:flex;gap:16px;align-items:center}
+#cv .head img{width:28mm;height:28mm;object-fit:cover;border-radius:50%}
+#cv.t-class h1{text-align:center}#cv.t-class .role,#cv.t-class .contact{text-align:center;justify-content:center}
+#cv.t-class{font-family:Georgia,'Times New Roman',serif}
+#cv.t-class h2{color:#111;border-bottom-color:#111}#cv.t-class .role{color:#111}
+#cv.t-class .head{justify-content:center}
+#cv.t-mod .headbox{background:var(--cv-acc,#1d4ed8);color:#fff;margin:-16mm -16mm 8mm;padding:12mm 16mm}
+#cv.t-mod .headbox .role,#cv.t-mod .headbox .contact{color:#e0e7ff}
+#cv.t-mod .headbox .role{font-weight:500}
+.empty{color:#9ca3af}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+@media print{
+  @page{size:A4;margin:0}
+  body{background:#fff}
+  header.top,.form,footer,.no-print{display:none!important}
+  .layout{display:block;padding:0;max-width:none}
+  .preview-wrap{position:static;max-height:none;overflow:visible}
+  .sheet-scale{transform:none!important}
+  #cv{box-shadow:none;width:auto;min-height:0;padding:14mm 16mm}
+  #cv.t-mod .headbox{margin:-14mm -16mm 8mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #cv h2,#cv .skills span{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Gerador de Currículo Profissional<small>Preencha à esquerda — o currículo aparece ao vivo à direita. Seus dados ficam só no seu navegador.</small></h1>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn sec" id="btnClear">Limpar tudo</button>
+    <button class="btn" id="btnPdf">⬇ Baixar PDF</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="form" id="form">
+
+    <details class="card" open><summary>1. Modelo e cor</summary><div class="body">
+      <div class="row">
+        <div><label>Modelo</label>
+          <select id="template"><option value="t-class">Clássico (ideal para ATS)</option><option value="t-simple">Simples</option><option value="t-mod">Moderno</option></select></div>
+        <div><label>Cor de destaque</label><input type="color" id="accent" value="#1d4ed8" style="height:38px;padding:3px"></div>
+      </div>
+      <div class="tip">Todos os modelos usam uma coluna e títulos padrão, o formato que os sistemas de triagem (ATS) leem melhor. Mantenha 1 página (até 2 se tiver muita experiência).</div>
+    </div></details>
+
+    <details class="card" open><summary>2. Dados pessoais</summary><div class="body">
+      <div class="row">
+        <div><label>Nome completo *</label><input id="name" placeholder="Ex.: Maria da Silva"></div>
+        <div><label>Cargo / título profissional *</label><input id="title" placeholder="Ex.: Analista de Marketing"></div>
+      </div>
+      <div class="row">
+        <div><label>E-mail *</label><input id="email" type="email" placeholder="nome@email.com"></div>
+        <div><label>Telefone *</label><input id="phone" placeholder="+244 900 000 000"></div>
+      </div>
+      <div class="row">
+        <div><label>Cidade / País</label><input id="city" placeholder="Luanda, Angola"></div>
+        <div><label>LinkedIn</label><input id="linkedin" placeholder="linkedin.com/in/seunome"></div>
+      </div>
+      <div class="row">
+        <div><label>Portfólio / site / GitHub</label><input id="site" placeholder="github.com/seunome"></div>
+        <div><label>Foto (opcional)</label><input id="photo" type="file" accept="image/*"></div>
+      </div>
+      <div class="tip">Evite data de nascimento, endereço completo, estado civil e documentos, a menos que o país ou a vaga exijam. Use um e-mail profissional. Foto só se a vaga ou o país costumam pedir.</div>
+    </div></details>
+
+    <details class="card" open><summary>3. Resumo profissional</summary><div class="body">
+      <textarea id="summary" rows="4" placeholder="2 a 4 linhas: quem você é, anos de experiência, principais competências e o que busca."></textarea>
+      <div class="tip">Fórmula: [cargo] com [X anos] de experiência em [área], especialista em [2–3 competências]. Resultado marcante: [conquista com número].</div>
+    </div></details>
+
+    <details class="card" open><summary>4. Experiência profissional</summary><div class="body">
+      <div class="tip">Ordem cronológica inversa (mais recente primeiro). Use verbos de ação e resultados com números: "Aumentei as vendas em 30%", "Liderei equipe de 5 pessoas". Uma conquista por linha.</div>
+      <div id="expList" class="body" style="padding:0"></div>
+      <button class="btn sec" data-add="exp">+ Adicionar experiência</button>
+    </div></details>
+
+    <details class="card"><summary>5. Formação académica</summary><div class="body">
+      <div id="eduList" class="body" style="padding:0"></div>
+      <button class="btn sec" data-add="edu">+ Adicionar formação</button>
+    </div></details>
+
+    <details class="card"><summary>6. Competências (skills)</summary><div class="body">
+      <label>Competências técnicas e comportamentais (separe por vírgula)</label>
+      <textarea id="skills" rows="3" placeholder="Excel avançado, Gestão de projetos, Comunicação, Liderança, Inglês"></textarea>
+      <div class="tip">Use as palavras-chave que aparecem na descrição da vaga. Entre 6 e 12 competências relevantes é suficiente.</div>
+    </div></details>
+
+    <details class="card"><summary>7. Idiomas</summary><div class="body">
+      <div id="langList" class="body" style="padding:0"></div>
+      <button class="btn sec" data-add="lang">+ Adicionar idioma</button>
+    </div></details>
+
+    <details class="card"><summary>8. Certificações e cursos</summary><div class="body">
+      <div id="certList" class="body" style="padding:0"></div>
+      <button class="btn sec" data-add="cert">+ Adicionar certificação</button>
+    </div></details>
+
+    <details class="card"><summary>9. Projetos</summary><div class="body">
+      <div id="projList" class="body" style="padding:0"></div>
+      <button class="btn sec" data-add="proj">+ Adicionar projeto</button>
+    </div></details>
+
+    <details class="card"><summary>10. Voluntariado, prémios e publicações</summary><div class="body">
+      <div id="extraList" class="body" style="padding:0"></div>
+      <button class="btn sec" data-add="extra">+ Adicionar item</button>
+    </div></details>
+
+    <details class="card"><summary>Checklist final</summary><div class="body">
+      <div class="tip" style="line-height:1.7">
+        ✔ Sem erros de ortografia (releia em voz alta)<br>
+        ✔ Máximo 1–2 páginas<br>
+        ✔ Adapte o resumo e as competências a cada vaga<br>
+        ✔ Conquistas com números sempre que possível<br>
+        ✔ Contactos atualizados e e-mail profissional<br>
+        ✔ Não escreva "Referências disponíveis" — ocupa espaço<br>
+        ✔ Nome do arquivo: Nome_Sobrenome_Curriculo.pdf
+      </div>
+    </div></details>
+  </div>
+
+  <div class="preview-wrap">
+    <div class="sheet-scale" id="scaler"><div id="cv" class="t-class"></div></div>
+  </div>
+</div>
+<footer class="no-print">Para baixar: clique em “Baixar PDF” e, na janela que abrir, escolha <b>Guardar como PDF</b> como destino. Assim o PDF mantém texto selecionável, essencial para ATS.</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='cv-data-v1';
+const schemas={
+  exp:[['role','Cargo','Ex.: Gestor de Vendas'],['company','Empresa','Ex.: Empresa XYZ'],['place','Local','Luanda'],['start','Início','Jan 2021'],['end','Fim','Atual'],['desc','Conquistas (uma por linha)','Aumentei as vendas em 30%\nLiderei equipe de 5 pessoas','ta']],
+  edu:[['degree','Curso / Grau','Licenciatura em Gestão'],['school','Instituição','Universidade X'],['place','Local',''],['start','Início','2016'],['end','Fim','2020'],['desc','Detalhes (média, menções, tese) — opcional','','ta']],
+  lang:[['lang','Idioma','Inglês'],['level','Nível','Fluente / B2 / Nativo']],
+  cert:[['name','Certificação / curso','Ex.: Google Analytics'],['org','Entidade','Google'],['year','Ano','2024']],
+  proj:[['name','Projeto','Nome do projeto'],['link','Link','github.com/...'],['desc','Descrição e resultado','','ta']],
+  extra:[['name','Título','Voluntário na ONG X'],['year','Período / ano','2023'],['desc','Descrição','','ta']]
+};
+const lists={exp:'expList',edu:'eduList',lang:'langList',cert:'certList',proj:'projList',extra:'extraList'};
+let data={template:'t-class',accent:'#1d4ed8',name:'',title:'',email:'',phone:'',city:'',linkedin:'',site:'',summary:'',skills:'',photo:'',exp:[],edu:[],lang:[],cert:[],proj:[],extra:[]};
+try{const s=localStorage.getItem(KEY);if(s)data={...data,...JSON.parse(s)}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+
+const simple=['name','title','email','phone','city','linkedin','site','summary','skills'];
+simple.forEach(k=>{$(k).value=data[k]||'';$(k).addEventListener('input',e=>{data[k]=e.target.value;render()})});
+$('template').value=data.template;$('accent').value=data.accent;
+$('template').onchange=e=>{data.template=e.target.value;render()};
+$('accent').oninput=e=>{data.accent=e.target.value;render()};
+$('photo').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');const s=300;c.width=c.height=s;const x=c.getContext('2d');const m=Math.min(img.width,img.height);x.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,s,s);data.photo=c.toDataURL('image/jpeg',.85);render()};img.src=r.result};r.readAsDataURL(f)};
+
+function buildList(type){
+  const box=$(lists[type]);box.innerHTML='';
+  data[type].forEach((it,i)=>{
+    const d=document.createElement('div');d.className='item';
+    let h='';
+    schemas[type].forEach(([k,l,p,t])=>{h+=`<div><label>${l}</label>${t?`<textarea data-k="${k}" placeholder="${esc(p)}" rows="3"></textarea>`:`<input data-k="${k}" placeholder="${esc(p)}">`}</div>`});
+    h+=`<div class="bar"><button class="btn sm sec" data-mv="-1">↑</button><button class="btn sm sec" data-mv="1">↓</button><button class="btn sm del" data-rm>Remover</button></div>`;
+    d.innerHTML=h;
+    d.querySelectorAll('[data-k]').forEach(el=>{el.value=it[el.dataset.k]||'';el.addEventListener('input',()=>{it[el.dataset.k]=el.value;render()})});
+    d.querySelector('[data-rm]').onclick=()=>{data[type].splice(i,1);buildList(type);render()};
+    d.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{const j=i+ +b.dataset.mv;if(j<0||j>=data[type].length)return;[data[type][i],data[type][j]]=[data[type][j],data[type][i]];buildList(type);render()});
+    box.appendChild(d);
+  });
+}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const t=b.dataset.add;data[t].push({});buildList(t);render()});
+
+const dates=(a,b)=>[a,b].filter(Boolean).join(' – ');
+const bullets=t=>{const l=String(t||'').split('\n').map(s=>s.trim().replace(/^[-•*]\s*/,'')).filter(Boolean);return l.length?`<ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''};
+const sec=(t,body)=>body?`<h2>${t}</h2>${body}`:'';
+
+function render(){
+  const cv=$('cv');
+  cv.className=data.template;cv.style.setProperty('--cv-acc',data.accent);
+  const contacts=[data.email,data.phone,data.city,data.linkedin,data.site].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join('');
+  const head=`<div class="head">${data.photo?`<img src="${data.photo}" alt="">`:''}<div><h1>${esc(data.name)||'<span class="empty">Seu Nome</span>'}</h1>${data.title?`<div class="role">${esc(data.title)}</div>`:''}<div class="contact">${contacts||'<span class="empty">email · telefone · cidade</span>'}</div></div></div>`;
+  let html=data.template==='t-mod'?`<div class="headbox">${head}</div>`:head;
+  html+=sec('Resumo Profissional',data.summary?`<p>${esc(data.summary).replace(/\n/g,'<br>')}</p>`:'');
+  html+=sec('Experiência Profissional',data.exp.filter(e=>e.role||e.company).map(e=>`<div class="entry"><div class="eh"><span>${esc(e.role)}</span><span class="d">${esc(dates(e.start,e.end))}</span></div><div class="sub">${esc([e.company,e.place].filter(Boolean).join(' · '))}</div>${bullets(e.desc)}</div>`).join(''));
+  html+=sec('Formação Académica',data.edu.filter(e=>e.degree||e.school).map(e=>`<div class="entry"><div class="eh"><span>${esc(e.degree)}</span><span class="d">${esc(dates(e.start,e.end))}</span></div><div class="sub">${esc([e.school,e.place].filter(Boolean).join(' · '))}</div>${bullets(e.desc)}</div>`).join(''));
+  const sk=data.skills.split(/[,\n;]/).map(s=>s.trim()).filter(Boolean);
+  html+=sec('Competências',sk.length?`<div class="skills">${sk.map(s=>`<span>${esc(s)}</span>`).join('')}</div>`:'');
+  html+=sec('Projetos',data.proj.filter(e=>e.name).map(e=>`<div class="entry"><div class="eh"><span>${esc(e.name)}</span><span class="d">${esc(e.link)}</span></div>${bullets(e.desc)}</div>`).join(''));
+  html+=sec('Certificações e Cursos',data.cert.filter(e=>e.name).map(e=>`<div class="entry" style="margin-bottom:3px"><div class="eh"><span>${esc(e.name)}${e.org?` <span style="font-weight:400">— ${esc(e.org)}</span>`:''}</span><span class="d">${esc(e.year)}</span></div></div>`).join(''));
+  html+=sec('Idiomas',data.lang.filter(e=>e.lang).map(e=>`<div>${esc(e.lang)}${e.level?` — ${esc(e.level)}`:''}</div>`).join(''));
+  html+=sec('Voluntariado, Prémios e Publicações',data.extra.filter(e=>e.name).map(e=>`<div class="entry"><div class="eh"><span>${esc(e.name)}</span><span class="d">${esc(e.year)}</span></div>${bullets(e.desc)}</div>`).join(''));
+  cv.innerHTML=html;
+  fit();save();
+}
+function fit(){
+  const wrap=document.querySelector('.preview-wrap'),sc=$('scaler');
+  const w=wrap.clientWidth,full=$('cv').offsetWidth;
+  const s=Math.min(1,w/full);
+  sc.style.transform=`scale(${s})`;
+  sc.style.height=($('cv').offsetHeight*s)+'px';
+}
+window.addEventListener('resize',fit);
+
+$('btnPdf').onclick=()=>{
+  if(!data.name.trim()){alert('Preencha pelo menos o seu nome antes de baixar.');$('name').focus();return}
+  const old=document.title;
+  document.title=data.name.trim().replace(/\s+/g,'_')+'_Curriculo';
+  window.print();
+  setTimeout(()=>document.title=old,1000);
+};
+$('btnClear').onclick=()=>{if(confirm('Apagar todos os dados do currículo?')){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}};
+
+Object.keys(lists).forEach(buildList);
+if(!data.exp.length&&!data.edu.length&&!data.name){data.exp.push({});data.edu.push({});data.lang.push({});buildList('exp');buildList('edu');buildList('lang')}
+render();
+</script>
+</body>
+</html>
